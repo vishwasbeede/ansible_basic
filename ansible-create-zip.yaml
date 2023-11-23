@@ -1,0 +1,15 @@
+---
+ - name: Example craete zip folder
+   hosts: all
+   tasks:
+     - name: Create a copy of folder
+       copy:
+         src: /data01/docker-app-store-task/mongo
+         dest: /data01/docker-app-store-task1
+     - name: Create a simple archieve using archive
+       archive:
+         path:
+           - /data01/docker-app-store-task1
+         dest: /data01/file.tar.bz2
+         format: bz2
+         remove: yes

@@ -1,0 +1,13 @@
+---
+- name: localhost play
+  hosts: localhost
+  tasks:
+  - shell: ps -ef | grep -w 'Hello World'
+    register: result
+    retries: 5
+    delay: 10
+    until: result.stdout is search 'Hello World'
+  - debug: msg=" {{result}} "
+...
+
+

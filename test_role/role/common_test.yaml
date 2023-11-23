@@ -1,0 +1,19 @@
+---
+ - hosts: all
+   roles:
+     - common_test
+   tasks:
+     - name: PEROFMR URI
+       ansible.builtin.uri:
+         url: "{{ tomcat_download_url }}"
+       register: resul
+       tags:
+         - skip
+     - name: PRINT RES
+       debug:
+         msg: "{{resul}}"
+       tags:
+         - skip
+...
+
+

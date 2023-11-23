@@ -1,0 +1,6 @@
+[db]
+127.0.0.1 ansible_connection=local 
+
+[db:vars]
+user_pwd="U$er1"
+

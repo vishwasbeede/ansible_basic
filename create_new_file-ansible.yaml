@@ -1,0 +1,20 @@
+---
+ - name: Ex of create new content file
+   hosts: all
+   connection: local
+   tasks:
+     - name: copy to create a file
+       copy:
+         dest: /data01/ansible-learn/content_new.txt
+         content:  |
+            Good Morning!i Hello
+            Awesome sunshine today.i.....
+         backup: yes
+     - name: Replace content of file, using line in file
+       lineinfile:
+         path: /data01/ansible-learn/conent_new.txt
+         regexp: '^G'
+         line: 'The line is replaced'
+     - name: Display content of file
+       debug: msg="FIle contents {{ lookup('ansible.builtin.file','/data01/ansible-learn/conent_new.txt') }} "
+     

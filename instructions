@@ -1,0 +1,163 @@
+RUN command line: ansible 127.0.0.1 -m debug -a msg="{{ lookup('ansible.builtin.env', 'HOME') }}"
+
+
+ungrouped:
+  hosts:
+    mail.example.com:
+webservers:
+  hosts:
+    foo.example.com:
+    bar.example.com:
+dbservers:
+  hosts:
+    one.example.com:
+    two.example.com:
+    three.example.com:
+
+Two groups created in ansible ALl and ungrouped
+
+
+
+ansible -i hosts ungrouped -m ping
+127.0.0.1 | UNREACHABLE! => {
+    "changed": false,
+    "msg": "Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 22: Connection refused",
+    "unreachable": true
+}
+
+
+
+===========================
+ansible -i hosts mygroup -m ping
+[WARNING]: Could not match supplied host pattern, ignoring: mygroup
+[WARNING]: No hosts matched, nothing to do
+vishwasbeede@IND-5CG0259CJQ:/data01/ansible-learn$ 
+
+hosts inventory file
+==========================
+127.0.0.1
+[db]
+127.0.0.2
+127.0.0.3
+[app]
+127.0.1.0
+127.0.1.1
+[lb]
+127.0.2.0
+127.0.2.1
+
+
+===============
+ansible -i hosts db -m ping 
+127.0.0.2 | UNREACHABLE! => {
+    "changed": false,
+    "msg": "Failed to connect to the host via ssh: ssh: connect to host 127.0.0.2 port 22: Connection refused",
+    "unreachable": true
+}
+127.0.0.3 | UNREACHABLE! => {
+    "changed": false,
+    "msg": "Failed to connect to the host via ssh: ssh: connect to host 127.0.0.3 port 22: Connection refused",
+    "unreachable": true
+}
+==========
+to execute ansible module in all db and app server 
+ansible -i hosts db,app -m ping
+
+
+----------------------
+jumper ansible_port=5555 ansible_host=192.0.2.50
+
+ansible -i hosts ungrouped  -m ping
+jumper | UNREACHABLE! => {
+    "changed": false,
+    "msg": "Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 5555: Connection refused",
+    "unreachable": true
+}
+127.0.0.1 | SUCCESS => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": false,
+    "ping": "pong"
+}
+
+================
+
+Assigning a variable to many machines: group variables
+
+/data01/ansible-learn$ ansible -i hosts3 all -m debug -a msg="{{user_pwd}}"
+127.0.0.1 | SUCCESS => {
+    "msg": "U$er1"
+}
+vishwasbeede:/data01/ansible-learn$ cat hosts3
+[db]
+127.0.0.1 ansible_connection=local 
+
+[db:vars]
+user_pwd="U$er1"
+
+
+==================
+
+Inheriting variable values: group variables for groups of groups
+NEED to use childern
+
+[gp1]
+localhosts1
+localhosts2
+
+[gp2]
+localshost3
+localhosst3
+
+[gp:childern]
+gp1
+gp2
+
+
+================
+ansible-playbook -i hosts -l ungrouped  ansible-forloop.yaml
+
+PLAY [Ansible for loop] *******************************************************************************************************************
+
+TASK [Gathering Facts] ********************************************************************************************************************
+ok: [127.0.0.1]
+
+TASK [Print for loop] *********************************************************************************************************************
+ok: [127.0.0.1] => (item=A) => {
+    "msg": "HELLOi A "
+}
+ok: [127.0.0.1] => (item=B) => {
+    "msg": "HELLOi B "
+}
+ok: [127.0.0.1] => (item=C) => {
+    "msg": "HELLOi C "
+}
+ok: [127.0.0.1] => (item=D) => {
+    "msg": "HELLOi D "
+}
+
+PLAY RECAP ********************************************************************************************************************************
+127.0.0.1                  : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+
+====
+---
+  - name: Ansible for loop
+    hosts: all
+    tasks:
+      - name: Print for loop
+        debug: msg="HELLOi {{item}} "
+        with_items: ["A","B","C","D"]
+
+====
+
+---
+  - name: Ansible for loop
+    hosts: all
+    tasks:
+      - name: Print for loop
+        debug: msg="HELLOi {{item}} "
+        with_items: ["A","B","C","D"]
+        when: item == "A"
+
+

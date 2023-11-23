@@ -1,0 +1,15 @@
+[sp]
+127.0.0.1 ansible_connection=local
+#jumper ansible_port=5555 ansible_host=127.0.0.1
+
+[db]
+127.0.0.2
+127.0.0.3
+[app]
+127.0.1.0
+127.0.1.1
+[lb]
+127.0.2.0
+127.0.2.1
+[special]
+127.0.[01:50].8

@@ -1,0 +1,12 @@
+---
+ - name: My first module
+   hosts: localhost
+   vars:
+     - date_reg: ""
+   tasks:
+     - name: Print date using custon module
+       printdate:
+         args_dt: yesterday
+       register: date_reg
+     - name: Preint values now
+       debug: msg="{{ date_reg }}"

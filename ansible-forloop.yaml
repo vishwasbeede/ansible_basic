@@ -1,0 +1,9 @@
+---
+  - name: Ansible for loop
+    hosts: all
+    tasks:
+      - name: Print for loop
+        debug: msg="HELLOi {{item}} "
+        with_items: ["A","B","C","D"]
+        when: item == "A"
+

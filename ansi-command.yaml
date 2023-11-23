@@ -1,0 +1,12 @@
+---
+ - name: The demo oretries
+   hosts: localhost
+   connection: local
+   tasks:
+   - name: capture date
+     command: "date +%s"
+     register: date_now
+     until: date_now == "12234"
+     retries: 2
+     delay: 1
+...

@@ -1,0 +1,4 @@
+date +%s d d
+ls -ltr
+pwd
+df -h

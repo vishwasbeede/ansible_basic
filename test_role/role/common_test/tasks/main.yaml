@@ -1,0 +1,24 @@
+- name: Test the file create example
+  debug: msg="HELLO USERS"
+- name: REST API CALL's
+  ansible.builtin.uri:
+    url: "{{ test_url + '/api/users?page=' + item }}"
+    method: GET
+    return_content: yes
+    body_format: json
+  register: rest_resp
+  with_items: ['1','2','3','4',]
+  tags: skip
+- name: Print response
+  debug:
+    msg: "{{ rest_resp }}"
+  tags: skip
+- name: append the below dictionary
+  set_fact:
+    users: "{{ users | combine({'id':'abcdef'}) }}"
+- name: SET facts 2
+  set_fact: 
+    users: "{{ users | combine({'id_1':'HELLO'}) }}"
+- name: PRINT RESULT
+  debug:  msg="{{ users }}"
+

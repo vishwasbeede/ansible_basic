@@ -1,0 +1,13 @@
+---
+ - name: Ansible handler example run another for file craetion
+   hosts: all
+   tasks:
+     - name: modify a file
+       file:
+        path: /data01/ansible-learn/vishwas.txt
+        state: file
+       notify: file_mod
+   handlers:
+     - name: file_mod
+       debug: msg="FILE CREATED"
+...

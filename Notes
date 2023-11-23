@@ -1,0 +1,177 @@
+Core concepts
+-----------------------------------------------------------------------------
+Human readable configuration files
+Tasks executed in order
+Configuration management
+Workflow orchestration
+App deployment
+Changes can be incremental or wholesale
+Schedule tasks daily, weekly, or monthly
+Perform regular state check and validation
+Agentless architecture (no need to install anything on managed nodes
+-----------------------------------------------------------------------------
+
+1. Control node - A machine where ansible is installed
+	We can use computer that has Python installed on it as a control node, but  cannot use a Windows machine as a control node.
+2. Managed nodes - N/W Devices or servers managed with ansible, Ansible is not installed on managed nodes.
+3. Inventory -  A list of managed nodes.An inventory file is also sometimes called a "hostfile". Your inventory can specify information like IP address for each managed node.
+/etc/ansible/hosts 
+execution - ansible-playbooks -i hosts -l <group_name> playbook_name.yaml
+execution - ansible -i hosts <pattern> playbook_ex.yaml
+
+4. Modules -  Smallest unit of code ansible executables. We can invoke single module with task, multiple module with playbook
+		They are different types of modules are
+	a.Cloud modules
+	b.Commands module
+	c.Messaging module
+	e.Packaging modules
+	f. Source control module
+	g. System modules
+	h. Identity modules
+	i. Windows modules
+5. tasks:
+	- name: Example task
+	  httpd:
+	    name: httpd
+	    state: latest
+	- name: Setup
+	  file: path=/var/www state=directory owner=myuser group=www-data mode=755
+	- name: Enable services
+	  service: name=nginx enabled=yes
+	- name: run command
+	  command: ps -ef | grep 'nginx'
+	- name: Configuration
+	  template: src=nginx.conf dest=/etc/nginx/http.d/default.conf
+
+Units of action in ansible
+
+6. Roles: Specialized list of commonds to perform
+7. Playbooks: Ordered lists of tasks, saved so you can run those tasks in that order repeatedly.Playbooks can include variables as well as tasks.
+8. Templates: Similar to Django templates
+
+BEST PRACTICES:
+GENERAL: Use version control ansible content
+	use command module as last option/resort.
+READABILITY: If you have more lines, then split, Vertical reading is easier (split long lines) , Keep plays and playbooks focused.ry to use one file if lines are less than 100, Try to use roles as much as possible.
+Performance: Profile with callback plugin to see which roles and playbooks takes too much time
+copy - only for single files or small dirs, else use synchronize module
+lineinfile try to switch to template instead of looping on one file
+Check forks config - by default its 5, update accordingly to number of your servers
+
+Inventory:
+Give inventory nodes human-meaningful names rather than IPs or DNS hostnames
+If you change inventory file frequently (one or two times a month) use dynamic inventory files
+
+Roles:
+Keep roles purpose and function focus
+Used a roles/ subdirectory for roles developed for organizational clarity in a single project
+Follow the Ansible Galaxy pattern for roles that are to be shared beyond a single project
+
+
+Idempotency
+An operation is idempotent if the result of performing it once is exactly the same as the result of performing it repeatedly without any intervening actions.
+
+Inventory Script
+A very simple program (or a complicated one) that looks up hosts, group membership for hosts, and variable information from an external resource -- whether that be a SQL database, a CMDB solution
+
+JSON
+Ansible uses JSON for return data from remote modules
+
+
+Lookup Plugin
+A lookup plugin is a way to get data into Ansible from the outside world. Lookup plugins are an extension of Jinja2 and can be accessed in templates,
+
+
+
+Modules
+Modules are the units of work that Ansible ships out to remote machines
+
+
+
+Notify
+The act of a task registering a change event and informing a handler task that another action needs to be run at the end of the play.
+If a handler is notified by multiple tasks, it will still be run only once. Handlers are run in the order they are listed, 
+not in the order that they are notified.
+
+ansible -i hosts ungrouped -a '/bin/grep PRETTY_NAME /etc/os-release'
+127.0.0.1 | CHANGED | rc=0 >>
+PRETTY_NAME="Ubuntu 22.04.2 LTS"
+
+
+
+By default Ansible uses only 5 simultaneous processes.
+-f 10 - Sets 10 parallel forks
+ansible [pattern] -m [module] -a '[module options]' -f 10
+
+
+Become (Run as root)
+ansible [pattern] -m [module] -a '[module options]' --become
+ansible myserver -a '/usr/bin/whoami' -u ubuntu --> Res: uuntu
+ansible myserver -a '/usr/bin/whoami' -u ubuntu became --> Res: root
+
+
+Check all facts:
+ansible myserver -m setup
+
+ansible -i hosts ungrouped -m pip -a 'name=flask state=absent'
+ ansible myserver -m apt -a 'name=python3 update_cache=yes state=latest'
+
+ansible myserver -m yum -a 'name=python3 state=present'
+ansible myserver -m yum -a 'name=python3 state=absent'
+ansible myserver -m yum -a 'name=python3 state=latest'
+
+
+
+ansible myserver -u ubuntu --become -m apt -a 'name=python3 state=present'
+
+ansible -i hosts ungrouped -m copy -a "src='/data01/tc.txt' dest='/data01/ansible-learn' mode='0444' owner='root' group='pronghorn'" --become
+
+
+ansible -i hosts sp -m user -a "name=vbg state=present" --become
+127.0.0.1 | CHANGED => {
+    "ansible_facts": {
+        "discovered_interpreter_python": "/usr/bin/python3"
+    },
+    "changed": true,
+    "comment": "",
+    "create_home": true,
+    "group": 1002,
+    "home": "/home/vbg",
+    "name": "vbg",
+    "shell": "/bin/sh",
+    "state": "present",
+    "system": false,
+    "uid": 1002
+}
+
+Handlers:	Running Operations On Change
+tasks:
+  - name: Set host variables based on distribution
+    include_vars: "{{ ansible_facts.distribution }}.yml"
+
+handlers:
+  - name: restart web service
+    service:
+      name: "{{ web_service_name | default('httpd') }}"
+      state: restarted
+
+============================
+tasks:
+    - name: restart everything
+      command: echo "this task will restart the web services"
+      notify: "restart web services"
+
+handlers:
+
+    - name: restart memcached
+      service:
+        name: memcached
+        state: restarted
+      listen: "restart web services"
+
+    - name: restart apache
+      service:
+        name: apache
+        state: restarted
+      listen: "restart web services"
+======================

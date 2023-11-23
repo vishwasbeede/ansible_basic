@@ -1,0 +1,15 @@
+---
+ - name: Ansible do retries
+   hosts: localhost
+   connection: local
+   tasks:
+   - name: Print some message
+     debug:
+       msg: "HELLO"
+   - name: capture date
+     command: date +%S
+     register: date_now
+     until:  date_now != 45
+     retries: 60
+     delay: 10
+...
