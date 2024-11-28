@@ -1,0 +1,40 @@
+---
+  - name: Check status of all the apache servers
+    hosts: all
+    gather_facts: false
+    connection: local
+    vars:
+     - installed_servers: []
+    tasks:
+      - name: Display the hosts
+        set_fact: 
+          last_server: "{{ hostvars[inventory_hostname].groups.aws[-1] }}"
+
+      - name: Get URI request
+        debug: msg="Checking in {{ ansible_host }}"
+        #set_fact: installed_servers=[]
+        #run_once: true
+
+      - name: Call the API
+        ansible.builtin.uri:
+          url: "http://{{ ansible_host }}:81"
+          method: GET
+          return_content: true
+        register: response_data
+
+      - name: Found the response
+        debug: msg="The Webservice up in {{ ansible_host }} {{ response_data.content }}"
+        when: response_data.status == 200
+
+      - name: Found the response
+        set_fact: 
+          installed_servers: "{{ installed_servers.concat(ansible_host ) }}"
+        when: response_data.status == 200
+
+      - name: Display the results
+        debug: 
+          var: installed_servers
+        when:  last_server == ansible_host
+            
+
+      

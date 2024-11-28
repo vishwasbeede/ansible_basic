@@ -1,0 +1,41 @@
+- name: "Deploy {{ pkgname }} webserver"
+  hosts: all
+  become: yes
+  tasks:
+    - name: Update apt package index
+      ansible.builtin.apt:
+        update_cache: yes
+    - name: Installing {{ pkgname }} packages
+      ansible.builtin.apt:
+        name: "{{ pkgname }}"
+        state: "{{ rk1 }}"
+    - name: Changing Listening port to 81
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        regexp: "^Listen 80"
+        line: Listen 81
+      notify: 
+      - hand    
+    - name: Changing default site to listen on port 81
+      ansible.builtin.lineinfile:
+        path: /etc/apache2/sites-available/000-default.conf
+        regexp: '^<VirtualHost \*:80>'
+        line: "<VirtualHost *:81>"
+      notify:
+      - hand    
+    - name: Configuring Apache configuration files
+      copy:
+        dest: /var/www/html/index.html
+        content: "<h1>This is a demo from Raman Khanna!</h1>"
+    - name: Configure hostname and IP in webpage
+      template:
+        src: files/index.html
+        dest: /var/www/html/index.html
+      notify:
+      - hand    
+  handlers:
+  - name: hand
+    service:
+      name: apache2
+      enabled: yes
+      state: restarted

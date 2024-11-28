@@ -1,0 +1,11 @@
+pkgname: apache2
+web_content: |
+  <h1>This is a demo for Apache Webserver!</h1>
+  <body style="colour:green;height:300px;width:300px">
+
+  <h1>Vishwas B G</h1>
+
+
+  </body/>
+  <p>Hostname: {{ ansible_hostname }}</p>
+  <p>IP Address: {{ ansible_default_ipv4.address }}</p>

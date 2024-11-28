@@ -1,0 +1,12 @@
+---
+ - name: Delete the provided username
+   hosts: all
+   become_user: root
+   vars:
+   - user_name: vishwas
+   tasks:
+   - name: Display the usernames
+     ansible.builtin.user:
+       name: "{{ user_name }}"
+       state: present
+

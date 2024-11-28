@@ -1,0 +1,32 @@
+---
+ - name: Create a users
+   vars:
+     user_name: VishwasBeede
+   connection: ssh
+   hosts: all
+   tasks:
+   - name: Now print something here
+     debug: msg="{{ user_name }}"
+
+   - name: Create the user
+     ansible.builtin.user:
+       name: '{{ user_name }}'
+         #shell: /bin/bash
+         #generate_ssh_key: yes
+         #ssh_key_bits: 2048
+         #ssh_key_file: .ssh/id_rsa
+       state: present
+     #check_mode: true
+     register: user_status
+     notify: send email to user
+     tags: user_create
+
+   - name: Check is users exists in server
+     debug: msg="user_doesnot exists"
+     when: user_status.changed == 1
+     tags: Validate
+
+   handlers:
+   - name: si%$end email to user - sdkj 
+     debug: 
+       msg:  "Provisioned user account"

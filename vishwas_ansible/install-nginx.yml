@@ -1,0 +1,11 @@
+---
+ - name: Install nginx
+   hosts: all
+   connection: ssh
+   gather_facts: false
+   tasks:
+   - name: print owd
+     shell: command="pwd"
+     register: op1
+   - name: Display results
+     debug: msg="{{ op1.stdout }}"
