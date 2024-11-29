@@ -1,0 +1,68 @@
+---
+- name: Installing Apache MSI
+  hosts: win
+  vars:
+    packages:
+    - git
+    - notepadplusplus
+    source: "report.txt"
+    destination: "Desktop/report.txt"  
+  tasks:
+    - name: create ansible directory
+      win_file:
+        path: C:\Ansible
+        state: directory
+    - name: Download the Apache installer
+      win_get_url:
+        url: https://archive.apache.org/dist/httpd/binaries/win32/httpd-2.2.25-win32-x86-no_ssl.msi
+        dest: C:\Ansible\httpd-2.2.25-win32-x86-no_ssl.msi
+    - name: Install MSI
+      win_package:
+        path: C:\Ansible\httpd-2.2.25-win32-x86-no_ssl.msi
+        state: present
+    - name: install packages
+      chocolatey.chocolatey.win_chocolatey:
+        name: "{{ packages }}"
+        state: present      
+    - name: creating win user
+      win_user:
+        name: ansibleuser
+        password: ansible@123456
+        state: present
+        groups:
+        - users     
+
+    
+    - name: Initialize Disk 1
+      community.windows.win_initialize_disk:
+        disk_number: 1
+        style: gpt
+
+    - name: Create a partition on Disk 1
+      community.windows.win_partition:
+        disk_number: 1
+        drive_letter: D
+        partition_size: 1gb
+ 
+
+    - name: Clear Read-Only Attribute on Disk 1
+      win_shell: |
+        Set-Disk -Number 1 -IsReadOnly $false      
+
+    - name: Format the partition on Disk 1
+      community.windows.win_format:
+        drive_letter: D
+        file_system: NTFS      
+    - name: Install all critical and security updates
+      ansible.windows.win_updates:
+        category_names:
+          - CriticalUpdates
+          - SecurityUpdates
+        state: installed
+        reboot: false
+        log_path: C:\ansible.txt
+    - name: Copy report.txt
+      ansible.windows.win_copy:
+        src: "{{ source }}"
+        dest: "{{ destination }}"
+

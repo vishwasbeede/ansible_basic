@@ -1,0 +1,10 @@
+---
+ - name: Install Download sample website files
+   hosts: win
+
+   gather_facts: false
+   tasks:
+     - name: Download simple web site to 'C:\inetpub\wwwroot\ansible.html'
+       win_get_url:
+         url: 'https://imkbhat.github.io/MyPortfolio/'
+         dest: 'C:\inetpub\wwwroot\ansible.html'
