@@ -4,7 +4,7 @@
     gather_facts: false
     connection: local
     vars:
-     - installed_servers: []
+     - installed_servers: ['asbf']
     tasks:
       - name: Display the hosts
         set_fact: 
@@ -23,18 +23,21 @@
         register: response_data
 
       - name: Found the response
+        #        debug: msg="The Webservice up in {{ ansible_host }} {{ response_data.content }}"
         debug: msg="The Webservice up in {{ ansible_host }} {{ response_data.content }}"
         when: response_data.status == 200
 
       - name: Found the response
         set_fact: 
-          installed_servers: "{{ installed_servers.concat(ansible_host ) }}"
+          installed_servers: "{{ installed_servers + [ ansible_host ] }}"
+        #register: installed_servers
+
         when: response_data.status == 200
 
       - name: Display the results
         debug: 
           var: installed_servers
-        when:  last_server == ansible_host
+            #when:  last_server == ansible_host
             
 
       

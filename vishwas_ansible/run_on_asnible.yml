@@ -1,0 +1,6 @@
+---
+ - name: Windows server install
+   hosts: win
+   roles:
+     - role: /home/ubuntu/ansible_basic/vishwas_ansible/ansible-windows-iis
+ 

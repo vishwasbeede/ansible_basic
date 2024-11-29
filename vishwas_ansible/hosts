@@ -2,6 +2,9 @@
 172.31.28.107 ansible_user=root
 172.31.23.57 ansible_user=root
 
+[raman]
+3.145.187.34  ansible_user=ubuntu ansible_password="khanna"
+
 [prod] 
 serv1
 serv2
@@ -14,6 +17,19 @@ ser[01:10:1].web.com
 
 [web]
 serv4
+
+[win]
+172.31.29.242
+
+[win:vars]
+ansible_user=Administrator
+ansible_password="kqF=x0(BUdOiq9H)!9mogxRf?$JB4sX("
+ansible_connection=winrm
+ansible_winrm_transport=basic
+ansible_winrm_server_cert_validation=ignore
+
+#[all_aws_ist:group_var]
+#installed_servers=[]
 
 [all_aws_inst]
 172.31.13.6

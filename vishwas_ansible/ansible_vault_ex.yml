@@ -1,0 +1,10 @@
+---
+ - name: Value1
+   hosts: all
+   vars_files:
+   - users_passwords.yml
+
+   tasks:
+   - name: tasks
+     debug: msg="{{ uk_domain }}"
+

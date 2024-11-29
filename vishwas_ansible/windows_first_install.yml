@@ -1,0 +1,12 @@
+---
+ - name: install nodejs
+   hosts: all
+   vars:
+     - nodejs_version: '20.18.0'
+   tasks:
+     - name: Install nodejs
+       chocolatey.chocolatey.win_chocolatey:
+         name: nodejs
+         version: '{{ nodejs_version }}'
+         state: upgrade
+       when: ansible_os_family == 'Windows' 

@@ -1,0 +1,44 @@
+---
+- name: to install a package 
+  hosts: all
+  gather_facts: yes
+  vars:
+    test: present
+  tasks:
+  - name: windows Run
+    block:  
+    - name: install IIS 
+      win_feature: 
+        name: 
+        - Web-Server
+        - Web-Common-Http
+        state: "{{ test }}"    
+      register: result_win
+    - name: print windows output
+      debug:
+        var: result_win
+    - name: default-source-object
+      win_copy:
+        dest: "C:\\inetpub\\wwwroot\\index.html"   
+        content: "Welcome to the windows instance of Vishwas B G"
+    - name: URI Get
+      win_uri:
+        url: "http://{{ansible_hostname}}"
+        method: GET
+      register: res_website
+
+    - name: debug msg
+      debug: msg="{{res_website.content}}"
+
+    when: ansible_os_family ==  "Windows"     
+  - name: block run for linux
+    block:
+    - name: installing talk 
+      apt: 
+        name: talk
+        state: "{{ test }}"
+      register: result_linux
+    - name: print linux output
+      debug:
+        var: result_linux
+    when: ansible_os_family == "Debian" 

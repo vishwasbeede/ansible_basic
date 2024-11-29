@@ -1,0 +1,18 @@
+---
+ - name: craete a users for windows server
+   hosts: win
+   vars:
+     _password: "Plain_data"
+     users: ['raman','rajesh','lini','venkat','Subbu','Antony']
+
+   tasks:
+     - name: pront all users
+       win_user: 
+         name: "{{ item }}"
+         password: "{{ _password }}"
+         state: present
+         groups:
+           - Users
+       loop: "{{users}}"
+       when: ansible_os_family == 'Windows'
+
