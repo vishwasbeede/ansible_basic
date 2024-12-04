@@ -8,9 +8,9 @@
   # ignore_unreachable: yes
   # stdout_callback: yaml
   
-  vars_files:
-    - "/tmp/vault.yml"
-    - "/tmp/vars.yml"
+  #vars_files:
+  #  - "/tmp/vault.yml"
+  #  - "/tmp/vars.yml"
 
   vars:
     ansible_python_interpreter: /usr/bin/python
