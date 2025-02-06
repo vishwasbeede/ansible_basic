@@ -1,0 +1,31 @@
+#ansible-playbook test_playbook_snow.yml -e "sample_host_hostname=xyz.hostname" -e "custom_args=some_args" -e "host=host1"
+- name: test the access to these devices
+  hosts: all
+  #hosts: "{{ sample_host_hostname }}"
+  hosts: "{{host|default('all')}}"
+  gather_facts: no
+  # ignore_errors: no
+  # ignore_unreachable: yes
+  # stdout_callback: yaml
+  
+  #vars_files:
+  #  - "/tmp/vault.yml"
+  #  - "/tmp/vars.yml"
+
+  vars:
+    ansible_python_interpreter: /usr/bin/python
+    #ansible_user: "{{ sample_host_username }}"
+    #ansible_password: "{{ sample_host_password }}"
+    display_message: "hello"
+   
+  tasks:
+    - name: Print somthing with debug
+      ansible.builtin.debug: msg="For testing extra commands {{ custom_args }}"
+
+    - name: display hostname
+      ansible.builtin.shell:
+        "df -h /tmp"
+      register: res_1
+
+    - name: disp msg
+      ansible.builtin.debug: msg="val is {{ res_1 }}"
