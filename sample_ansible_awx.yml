@@ -1,8 +1,8 @@
 #ansible-playbook test_playbook_snow.yml -e "sample_host_hostname=xyz.hostname" -e "custom_args=some_args"
 - name: test the access to these devices
-  hosts: all
+  # hosts: all
   #hosts: "{{ sample_host_hostname }}"
-  #hosts: "{{host|default('all')}}"
+  hosts: "{{host|default('all')}}"
   gather_facts: no
   # ignore_errors: no
   # ignore_unreachable: yes
